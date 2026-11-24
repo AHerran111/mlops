@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Embedded tableau dashboards</title>
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --accent: #1d4ed8;
+            --bg-soft: #f8fafc;
+            --err: #b91c1c;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color: var(--ink);
+        }
+
+        header {
+            padding: 20px 24px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        h1 { margin: 0 0 14px; font-size: 1.6rem; }
+
+        .tabs { display: flex; gap: 4px; }
+
+        .tab {
+            border: none;
+            background: none;
+            padding: 10px 16px;
+            font: inherit;
+            color: var(--muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab[aria-selected="true"] {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .panel { padding: 24px; }
+        .panel[hidden] { display: none; }
+
+        /* Prediction form */
+        .predict-wrap { max-width: 720px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
+
+        select, input {
+            width: 100%;
+            padding: 9px 10px;
+            font: inherit;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+        .hint { font-size: .8rem; color: var(--muted); margin-top: 4px; min-height: 1em; }
+
+        button.primary {
+            margin-top: 20px;
+            padding: 10px 22px;
+            font: inherit;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button.primary:disabled { opacity: .6; cursor: progress; }
+
+        .result {
+            margin-top: 24px;
+            padding: 18px 20px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--bg-soft);
+        }
+
+        .result[hidden] { display: none; }
+        .result .big { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
+        .result.error { border-color: #fecaca; background: #fef2f2; color: var(--err); }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: .8rem;
+            background: #fff;
+            border: 1px solid var(--line);
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Embedded Tableau Dashboard</h1>
+        <nav class="tabs" role="tablist">
+            <button class="tab" role="tab" id="tab-dashboard" aria-controls="panel-dashboard"
+                aria-selected="true">Dashboard</button>
+            <button class="tab" role="tab" id="tab-predict" aria-controls="panel-predict"
+                aria-selected="false">Price prediction</button>
+        </nav>
+    </header>
+
+    <!-- ============ TAB 1: Tableau dashboard (unchanged embed) ============ -->
+    <section class="panel" id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
+        <div class='tableauPlaceholder' id='viz1795449176466' style='position: relative'><noscript><a href='#'><img
+                        alt='Sheet 1 '
+                        src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;ma&#47;mapa_bueno&#47;Sheet1&#47;1_rss.png'
+                        style='border: none' /></a></noscript><object class='tableauViz' style='display:none;'>
+                <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                <param name='embed_code_version' value='3' />
+                <param name='site_root' value='' />
+                <param name='name' value='mapa_bueno&#47;Sheet1' />
+                <param name='tabs' value='no' />
+                <param name='toolbar' value='yes' />
+                <param name='static_image'
+                    value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;ma&#47;mapa_bueno&#47;Sheet1&#47;1.png' />
+                <param name='animate_transition' value='yes' />
+                <param name='display_static_image' value='yes' />
+                <param name='display_spinner' value='yes' />
+                <param name='display_overlay' value='yes' />
+                <param name='display_count' value='yes' />
+                <param name='language' value='en-US' />
+            </object></div>
+        <script
+            type='text/javascript'>                    var divElement = document.getElementById('viz1795449176466'); var vizElement = divElement.getElementsByTagName('object')[0]; vizElement.style.width = '100%'; vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px'; var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+    </section>
+
+    <!-- ============ TAB 2: Prediction form ============ -->
+    <section class="panel" id="panel-predict" role="tabpanel" aria-labelledby="tab-predict" hidden>
+        <div class="predict-wrap">
+            <form id="predict-form" novalidate>
+                <div class="grid">
+                    <div>
+                        <label for="f-mun">Municipality</label>
+                        <select id="f-mun" required></select>
+                    </div>
+                    <div>
+                        <label for="f-cp">Postal code (CP)</label>
+                        <select id="f-cp" required></select>
+                        <div class="hint" id="cp-hint"></div>
+                    </div>
+                    <div>
+                        <label for="f-type">Property type</label>
+                        <select id="f-type" required>
+                            <option value="CASA">Casa</option>
+                            <option value="DEPARTAMENTO">Departamento</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="f-terrain">Terrain (m²)</label>
+                        <input id="f-terrain" type="number" min="1" step="any" value="100" required>
+                    </div>
+                    <div>
+                        <label for="f-year">Year</label>
+                        <select id="f-year" required></select>
+                    </div>
+                    <div>
+                        <label for="f-quarter">Quarter</label>
+                        <select id="f-quarter" required>
+                            <option value="1">Q1</option>
+                            <option value="2">Q2</option>
+                            <option value="3">Q3</option>
+                            <option value="4">Q4</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="primary" id="f-submit">Predict price</button>
+            </form>
+
+            <div class="result" id="result" hidden aria-live="polite"></div>
+        </div>
+    </section>
+
+    <script>
+        // ---------------- Config ----------------
+        const API_URL = "https://2rg31pyc2f.execute-api.us-east-2.amazonaws.com/default/SageMakerAPI-PREPROCESS";
+        const YEARS = [2020, 2021, 2022, 2023, 2024]; // years covered by the training data
+
+        // Municipality -> [[CP, [sample colonies]], ...]  (from Clean/cp_dict.csv)
+        const CP_DATA = {"GUADALAJARA":[[44100,["Guadalajara Centro"]],[44110,["Vallarta Poniente"]],[44130,["Arcos","Arcos Vallarta"]],[44160,["Americana"]],[44170,["San Antonio"]],[44180,["Mexicaltzingo"]],[44190,["Moderna"]],[44200,["Artesanos"]],[44210,["Jardines Del Country"]],[44216,["Fidel Velazquez"]],[44218,["Fabrica De Atemajac"]],[44220,["Guadalupana Sur","Santa Elena Alcalde Oriente","Santa Monica"]],[44230,["Autocinema","Division Del Norte","Santa Elena De La Cruz"]],[44240,["Fovissste Independencia","Lomas De Independencia","Rancho Nuevo"]],[44249,["El Jaguey"]],[44250,["Balcones De Huentitan","Huentitan El Bajo","Lomas Del Paraiso 1A. Seccion"]],[44259,["Panoramica Huentitan"]],[44260,["La Normal","Mezquitan","Mezquitan Country"]],[44266,["Observatorio"]],[44270,["Alcalde Barranquitas","Colinas De La Normal","Miraflores"]],[44280,["Centro Barranquitas","El Retiro"]],[44290,["Independencia"]],[44298,["Jardines Alcalde"]],[44299,["Villas De San Juan"]],[44300,["Batallon De San Patricio","Colonia No. 9","Esperanza"]],[44320,["Belisario Dominguez","Monumental"]],[44330,["Circunvalacion Belisario","San Marcos Oriente","San Vicente"]],[44340,["Independencia Oriente"]],[44350,["Postes Cuates (Federalismo)","Santa Maria"]],[44360,["La Perla","San Juan De Dios"]],[44370,["El Mirador"]],[44390,["Balcones De La Joya","Huentitan El Alto","La Joyita"]],[44398,["Colinas De Huentitan"]],[44399,["Dr. Atl"]],[44400,["Real","Revolucion"]],[44410,["La Loma","Medrano"]],[44420,["Obrera","Unidad Modelo","Valentin Gomez Farias"]],[44430,["El Periodista","Olimpica","Quinta Velarde"]],[44440,["El Dean","Ferrocarril","Valle Del Alamo"]],[44450,["Analco"]],[44460,["La Aurora","Las Conchas","San Carlos"]],[44467,["Rincon De Agua Azul"]],[44469,["Barragan Y Hernandez"]],[44470,["El Manantial","Higuerillas 1A Secc","La Nogalera"]],[44490,["Lazaro Cardenas","Parque Industrial El Alamo"]],[44493,["Las Juntas"]],[44500,["Chapalita","Jardines De Los Arcos","Residencial Chapalita"]],[44510,["Jardines De Plaza Del Sol"]],[44520,["Jardines Del Bosque Norte"]],[44530,["Comercial Abastos"]],[44540,["Bosques De La Victoria","Bosques Del Valle"]],[44550,["Verde Valle"]],[44560,["Residencial Victoria"]],[44580,["Santa Eduwiges"]],[44600,["Ladron De Guevara"]],[44610,["Country Club","Lomas Del Country"]],[44620,["Ayuntamiento","Chapultepec Country"]],[44630,["Circunvalacion Americas","Providencia"]],[44647,["Lomas De Providencia"]],[44648,["Italia Providencia"]],[44657,["Lomas De Guevara"]],[44660,["Colinas De San Javier","Colomos Providencia","Los Colomos"]],[44670,["Monraz","Prados De Providencia"]],[44678,["Lomas Santa Rita"]],[44680,["Circunvalacion Vallarta","Residencial Juan Manuel"]],[44689,["Terranova"]],[44690,["Vallarta Norte","Vallarta San Jorge"]],[44700,["Guadalajara Oriente","Oblatos","Santa Cecilia 1A. Seccion"]],[44710,["Popular","San Martin","Santos Degollado"]],[44716,["Circunvalacion Oblatos"]],[44719,["Ampliacion Talpita"]],[44720,["Arandas","Balcones De Oblatos","Bethel"]],[44723,["Plutarco Elias Calles 1"]],[44724,["San Eugenio"]],[44726,["San Jose Rio Verde 1A. Seccion"]],[44727,["Tetlan Rio Verde"]],[44729,["Jardines De La Barranca","Residencial De La Barranca"]],[44730,["Antigua Penal De Oblatos","Blanco Y Cuellar 1Ra.","Progreso"]],[44740,["Jardines De Guadalupe","San Isidro"]],[44750,["Cuauhtemoc Popular","Libertad","Santa Maria De Silo"]],[44760,["Beatriz Hernandez","El Zalate","Lomas Del Gallo"]],[44766,["Los Arrayanes"]],[44768,["Joaquin Aaron"]],[44769,["La Campesina"]],[44770,["Benito Juarez","Hermosa Provincia","Lagos De Oriente"]],[44790,["Jardines De San Francisco"]],[44810,["Electricistas","Hormiguero","San Andres"]],[44820,["Aldama Tetlan","Insurgentes 1A Secc","Insurgentes La Presa"]],[44825,["Parques De San Pedro","Popular Hornos"]],[44828,["Vistas Del Nilo"]],[44829,["Cantarranas"]],[44840,["Lomas Del Paradero","Prados Del Nilo","Sutaj"]],[44860,["Jardines De La Paz","Jardines Del Nilo","La Paz"]],[44870,["Atlas"]],[44890,["El Rosario","Jardines Del Rosario","Rancho Blanco"]],[44895,["El Mirador Alamo"]],[44897,["Lomas De San Pedro"]],[44899,["Bosques Del Boulevard"]],[44900,["Del Fresno 1A. Seccion"]],[44910,["8 De Julio","Morelos"]],[44920,["Colon","Del Sur","Las Torres"]],[44930,["Colon Industrial"]],[44940,["Zona Industrial"]],[44948,["Villa Hermosa"]],[44950,["Jardines De La Cruz 1A. Seccion","Jardines De San Jose","Jardines Del Sur"]],[44960,["18 De Marzo","Lomas De Polanco","Lopez Portillo"]],[44969,["Polanquito"]],[44970,["1 De Mayo","5 De Mayo","Echeverria"]],[44977,["El Rocio"]],[44980,["Arboledas Del Sur","El Carmen","Emiliano Zapata"]],[44984,["Balcones Del Cuatro"]],[44985,["Revolucionaria"]],[44986,["Loma Linda","Lomas Del Pedregal"]],[44987,["Jardines El Sauz","Villa Vicente Guerrero"]],[44990,["Miravalle"]]],"TLAJOMULCO":[[45640,["Arcos De La Cruz","Banus","Bosques De La Esperanza"]],[45641,["Hacienda La Noria","Lomas De Tejeda","Lomas Habitacional"]],[45643,["Cielo Contry Club","El Palomar","Las Villas"]],[45644,["Santa Cruz De La Loma (Tepetates)","Soledad De Cruz Vieja"]],[45645,["Altea","Arbolada Bosques De Santa Anita","Bellaterra"]],[45646,["Acueducto San Agustin","Acueducto San Javier","Adamar"]],[45647,["La Tijera","Tulipanes","Villas De La Tijera"]],[45650,["Balcones De Santa Anita","Colina Real (Benito Villasenor)","Colinas Del Roble"]],[45653,["4 Estaciones","Chulavista","Colina De La Cruz"]],[45654,["Altus Bosques","Hacienda San Miguel","Jardines Del Eden"]],[45655,["Hacienda Santa Cruz","La Antigua","La Reserva"]],[45660,["Lomas De San Diego","Nuevo San Miguel","Pedregal De San Miguel"]],[45663,["San Lucas Evangelista"]],[45664,["Cuexcomatitlan"]],[45665,["San Juan Evangelista (San Juan)"]],[45670,["Arvento","Cajititlan","Tres Reyes"]],[45672,["Paseos Del Valle","Zapote Del Valle"]],[45675,["Albereda Residencial","El Capulin","Los Silos"]],[45676,["Jardines De La Calera","Villa San Remo"]],[45677,["Balcones De La Calera"]],[45678,["La Calera"]],[45679,["Alameda","Jardines De La Alameda","Los Ciruelos"]]],"TLAQUEPAQUE":[[45500,["Tlaquepaque Centro","Tlaquepaque Pueblito"]],[45510,["Los Meseros"]],[45519,["Jardines De La Paz"]],[45520,["Lindavista","Los Altos"]],[45525,["Parque Tlaquepaque","Real Patria","Residencial La Soledad"]],[45527,["La Asuncion"]],[45530,["Arroyo De Las Flores","Francisco I. Madero","Guayabitos"]],[45535,["Lomas De Santa Maria"]],[45540,["Camichines Residencial 1Ra. Seccion","Hidalgo"]],[45550,["Quintero"]],[45559,["Lomas De Tlaquepaque","Prados Tlaquepaque"]],[45560,["Alamo","Alamo Oriente","El Alamo"]],[45570,["Colonial Tlaquepaque"]],[45579,["Hacienda De Tlaquepaque"]],[45580,["Canal 58","Hacienda De Vidrios","La Duraznera"]],[45588,["El Organo","El Tapatio","Haciendas San Pedro"]],[45589,["Las Huertas","Lomas De San Miguel"]],[45590,["Brisas De Chapala","Cumbres Del Prado","Felipe Angeles"]],[45593,["Alamo Industrial"]],[45594,["Fovissste Miravalle","Infonavit Miravalle","Terralta"]],[45595,["El Vergel 1Ra. Seccion","Micaelita"]],[45596,["La Guadalupana"]],[45597,["El Campesino"]],[45598,["Artesanos","La Romita"]],[45599,["Cerro Del Cuatro","El Refugio","Guadalupe Ejidal"]],[45600,["El Mirador Juan Arias","La Candelaria","La Caridad"]],[45601,["Amaneceres","Barrio De San Miguel","El Real"]],[45602,["Antares","Aurea Residencial","El Sereno"]],[45605,["Mezquitera"]],[45606,["Balcones De Santa Maria","Buenos Aires","Jardines De Santa Maria"]],[45607,["Lomas De La Victoria"]],[45608,["El Sauz","Loma Bonita Ejidal","Mirador Del Tesoro"]],[45609,["Arroyo Seco","Haciendas De San Jose","Parques De Santa Maria"]],[45610,["Pedregal Del Bosque","Real Tulipanes","Toluquilla"]],[45613,["Paseo Del Prado"]],[45615,["Coto Del Carmen","Lopez Cotilla","Mision Magnolia"]],[45618,["Juan De La Barrera","Parques Del Palmar","Senderos De Tlaquepaque"]],[45619,["Paseos Del Lago"]],[45620,["Plan De Rio"]],[45623,["Las Liebres"]],[45625,["San Pedrito"]],[45627,["Abadia San Martin","Verde Valle"]],[45628,["Alfredo Barba","Lomas Del Tapatio"]],[45629,["Alvaro Obregon","El Cerrito","El Morito"]],[45630,["Cantera Colorada","Cerro Del Jaguey","Residencial Las Lomas"]],[45638,["Arboledas De San Martin","Emiliano Zapata","Francisco Silva Romero"]]],"ZAPOPAN":[[45010,["Bellavista","Chapalita Inn","Ciudad Granja"]],[45012,["Ayamonte","Vallarta"]],[45016,["Lomas Universidad","Paseos Universidad","Villas De Vallarta"]],[45017,["El Bajio","Jocotan","Puertas Del Tule"]],[45018,["Residencial Del Parque","Santa Maria Del Pueblito"]],[45019,["Altamira","Arauca","Arauca Ii"]],[45020,["Camichines Vallarta","Eucalipto Vallarta","Prados Vallarta"]],[45027,["Jardines Vallarta","Rinconada De Los Novelistas"]],[45030,["Atlas Chapalita","Chapalita De Occidente","Chapalita Las Fuentes"]],[45034,["Jardines Tepeyac","Los Olivos"]],[45036,["Colli Sitio","Guadalupe Sur","Nueva Galicia 1"]],[45037,["Arcos De Guadalupe","Guadalupe Inn","Parques Guadalupe"]],[45038,["Lomas De Guadalupe","Lomas Del Seminario"]],[45039,["Residencial Cordilleras"]],[45040,["Camino Real","Chapalita Oriente","Chapalita Sur"]],[45047,["Guadalupe","Rinconada Del Valle","Tepeyac Casino"]],[45049,["Don Bosco Vallarta"]],[45050,["Ciudad Del Sol","El Zapote","Jardines Del Sol"]],[45053,["Hacienda Del Tepeyac","Parques Del Tepeyac","Residencial Tepeyac Del Sol"]],[45054,["Mirador Del Sol"]],[45055,["Plaza Del Sol"]],[45056,["Colli C.T.M."]],[45057,["El Colli Primavera"]],[45058,["Nueva Primavera","Villa Puerta Del Sol","Villas Del Tepeyac"]],[45059,["Residencial Moctezuma","Residencial Moctezuma Poniente"]],[45060,["Miramar"]],[45065,["Carlos Rivera","Jardines Tapatios","Lomas De La Primavera"]],[45066,["5 De Noviembre","Arenales Tapatios","Bosque Real"]],[45067,["Mariano Otero"]],[45068,["12 De Diciembre","Balcones Del Sol","El Rehilete"]],[45069,["Paraisos Del Colli"]],[45070,["El Colli Urbano 1A. Seccion","La Calma","Las Fuentes"]],[45076,["Unidad Cadete Francisco Marquez"]],[45077,["Las Piramides"]],[45078,["Periodistas"]],[45079,["Las Alamedas","Paseos Del Sol"]],[45080,["Colinas De Las Aguilas","Las Aguilas","Pinar De La Calma"]],[45085,["Loma Bonita Ejidal"]],[45086,["Loma Bonita","Loma Bonita Sur"]],[45088,["La Giralda"]],[45089,["Residencial Victoria"]],[45100,["La Villa","Zapopan Centro"]],[45110,["Colinas De San Javier","El Alcazar Oriente","El Alcazar Poniente"]],[45115,["Colinas Virreyes","Entrelomas Residencial","Puerta Las Lomas"]],[45116,["Pontevedra","Puerta Aqua","Puerta De Hierro"]],[45117,["Callejon Del Parque","Parque De La Castellana","Parque Regency"]],[45118,["Atlas Colomos","El Prado","Guadalajarita"]],[45119,["La Patria Universidad"]],[45120,["Hacienda De Las Lomas","Juan Manuel Vallarta","Los Pinos"]],[45128,["Lomas Altas"]],[45129,["Loma Real","Lomas Del Valle"]],[45130,["Altagracia","Arcos De Zapopan 1A. Seccion","Bosques De Zapopan"]],[45133,["Canteras Del Centinela","Colinas Del Centinela","Haciendas Del Valle"]],[45134,["Altaterra","Altaterra Ii","Bosque De Los Encinos"]],[45136,["Jardin Real","La Ceiba","La Mora"]],[45138,["Armonia Habitat","Base Aerea Militar No. 5","Colegio Del Aire"]],[45140,["El Vigia","La Loma","Residencial Los Frailes"]],[45145,["Parque Industrial Belenes Norte"]],[45146,["Unidad Republica"]],[45147,["San Isidro Ejidal"]],[45148,["La Arboleda"]],[45149,["Unidad Fovissste"]],[45150,["Ecologica Seattle","El Capullo","Los Maestros"]],[45157,["El Paraiso","Industrial Los Belenes","Villa De Los Belenes"]],[45158,["Los Laureles"]],[45159,["La Aurora"]],[45160,["Agraria","Plaza Patria","San Miguel De La Colina"]],[45167,["Loma Blanca"]],[45168,["Santa Fe"]],[45169,["Lindavista","Villa Coral","Villa Magna"]],[45170,["Colinas De Atemajac","Gvsa","Zoquipan"]],[45177,["Lagos Del Country"]],[45178,["Lomas De Atemajac"]],[45179,["Santa Paula"]],[45180,["27 De Septiembre","Bosque Escondido","Colinas De Los Belenes"]],[45184,["Constituyentes"]],[45185,["Alamedas De Tesistan","Colinas De Tabachines","Emiliano Zapata"]],[45186,["Agua Fria","Arroyo Hondo","Balcones De La Cantera"]],[45187,["Bosques Del Centinela","El Bosque","Lomas Del Centinela"]],[45188,["Jardines De Tabachines","Lomas Del Vergel","Tabachines"]],[45189,["Crucero De La Mesa","La Coronilla","La Higuera"]],[45190,["Atemajac Del Valle","El Batan","Gonzalez Ortega"]],[45198,["La Experiencia"]],[45199,["Benito Juarez","Benito Juarez Norte"]],[45200,["Altaluz Residencial","Altus Quintas","Alviento Residencial"]],[45205,["San Esteban (San Miguel Tateposco)"]],[45220,["Nextipac"]],[45221,["La Venta Del Astillero","Pinar De La Venta"]],[45222,["Bosques Vallarta","Rancho Contento"]],[45226,["La Primavera"]],[45230,["Jardines De Santa Ana","La Haciendita","Punta De Otero"]],[45234,["El Campanario","La Florida","La Palmira"]],[45235,["Agua Blanca","Agua Blanca Industrial","Agua Blanca Sur"]],[45236,["Agricola","El Garabato","Francisco Sarabia"]],[45237,["Bugambilias Country","Ciudad Bugambilia","Cristal"]],[45239,["Azaleas Residencial","Miguel De La Madrid Hurtado","Paraiso Los Pinos"]],[45242,["La Soledad"]]]};
+
+        // ---------------- Tabs ----------------
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => tab.addEventListener('click', () => {
+            tabs.forEach(t => {
+                const on = t === tab;
+                t.setAttribute('aria-selected', on);
+                document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+            });
+        }));
+
+        // ---------------- Form setup ----------------
+        const $mun = document.getElementById('f-mun');
+        const $cp = document.getElementById('f-cp');
+        const $cpHint = document.getElementById('cp-hint');
+        const $year = document.getElementById('f-year');
+        const $terrain = document.getElementById('f-terrain');
+        const $type = document.getElementById('f-type');
+        const $quarter = document.getElementById('f-quarter');
+        const $submit = document.getElementById('f-submit');
+        const $result = document.getElementById('result');
+
+        const colonies = {}; // CP -> colonies, for the hint under the CP select
+        Object.keys(CP_DATA).sort().forEach(m => {
+            $mun.add(new Option(m, m));
+            CP_DATA[m].forEach(([cp, cols]) => { colonies[cp] = cols; });
+        });
+        YEARS.slice().reverse().forEach(y => $year.add(new Option(y, y)));
+
+        function fillCPs() {
+            $cp.innerHTML = '';
+            CP_DATA[$mun.value].forEach(([cp]) => $cp.add(new Option(cp, cp)));
+            showColonies();
+        }
+        function showColonies() {
+            const cols = colonies[$cp.value] || [];
+            $cpHint.textContent = cols.length ? cols.join(', ') + (cols.length === 3 ? '…' : '') : '';
+        }
+        $mun.addEventListener('change', fillCPs);
+        $cp.addEventListener('change', showColonies);
+        $mun.value = CP_DATA.ZAPOPAN ? 'ZAPOPAN' : $mun.options[0].value;
+        fillCPs();
+
+        // ---------------- Result helpers ----------------
+        const mxn = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
+
+        // Pulls the first number out of whatever shape the API returns
+        // (plain number, {"prediction": n}, {"body": "..."}, [n], etc.)
+        function findNumber(v) {
+            if (typeof v === 'number' && isFinite(v)) return v;
+            if (typeof v === 'string') {
+                try { return findNumber(JSON.parse(v)); } catch { const n = parseFloat(v); return isFinite(n) ? n : null; }
+            }
+            if (Array.isArray(v)) { for (const x of v) { const n = findNumber(x); if (n !== null) return n; } }
+            else if (v && typeof v === 'object') { for (const k in v) { const n = findNumber(v[k]); if (n !== null) return n; } }
+            return null;
+        }
+
+        function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+        function showResult(html, isError) {
+            $result.className = 'result' + (isError ? ' error' : '');
+            $result.innerHTML = html;
+            $result.hidden = false;
+        }
+
+        // ---------------- Submit ----------------
+        document.getElementById('predict-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const terrain = parseFloat($terrain.value);
+            if (!(terrain > 0)) { showResult('Terrain must be a number greater than 0.', true); return; }
+
+            const payload = {
+                request: {
+                    Municipality: $mun.value,
+                    CP: parseInt($cp.value, 10),
+                    Year: parseInt($year.value, 10),
+                    Quarter: parseInt($quarter.value, 10),
+                    Terrain: terrain,
+                    Type: $type.value
+                }
+            };
+
+            $submit.disabled = true;
+            $submit.textContent = 'Predicting…';
+            try {
+                // POST with the JSON body and no headers on purpose: keeps it a CORS "simple request" (no OPTIONS preflight).
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const text = await res.text();
+                let data; try { data = JSON.parse(text); } catch { data = text; }
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
+
+                // Expected: {"prediction": [3503336.79]}
+                const value = (data && Array.isArray(data.prediction) && typeof data.prediction[0] === 'number')
+                    ? data.prediction[0]
+                    : findNumber(data);
+                if (value === null) throw new Error('Unexpected response: ' + (typeof data === 'string' ? data : JSON.stringify(data)));
+                const r = payload.request;
+                showResult(
+                    `<div>Estimated price</div>
+                     <div class="big">${value !== null ? mxn.format(value) : '—'}</div>
+                     <div class="hint">${esc(r.Type)} · ${r.Terrain} m² · CP ${r.CP}, ${esc(r.Municipality)} · ${r.Year} Q${r.Quarter}</div>
+                     <details><summary class="hint">Raw response</summary><pre>${esc(typeof data === 'string' ? data : JSON.stringify(data, null, 2))}</pre></details>`
+                );
+            } catch (err) {
+                showResult(`Could not get a prediction.<br><small>${esc(err.message)}</small>`, true);
+            } finally {
+                $submit.disabled = false;
+                $submit.textContent = 'Predict price';
+            }
+        });
+    </script>
+</body>
+
+</html>
